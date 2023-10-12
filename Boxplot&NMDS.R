@@ -6,6 +6,7 @@ library(reshape2)
 library(data.table)
 library(janitor)
 
+##Kalle run this chunk:
 Total <- read.csv("Control_adjusted_samples.csv")
 Total$Total <- as.numeric(Total$Total)
 prop <- read.csv("cirsium_proportions.csv")
@@ -42,39 +43,50 @@ boxplot(het$Total~het$Sample.type, xlab="Tissue", ylab= "Relative abundance", ma
 boxplot(ole$Total~ole$Sample.type, xlab="Tissue", ylab= "Relative abundance", main = "Relative emission per tissue C. oleraceum", col = c(1:length(as.factor(ole$Sample.type))))
 
 
-###Compounds###
+###Compounds### Kalle run this
 library(vegan)
 library(RColorBrewer)
 library(reshape2)
 library(pals)
 
 
-# Find smallest non-zero variable
+# Find smallest non-zero variable ; Kalle run this
 scentValues <- as.vector(as.matrix(prop[,12:58]))
 smallestNonZero <- min(scentValues[scentValues > 0])
 smallestNonZero
 
-# Adding this value as a dummy variable to every sample
+# Adding this value as a dummy variable to every sample; Kalle run this
 prop2 <- prop
 prop2$DummyVariable <- smallestNonZero
 
-# PERMANOVA
+# PERMANOVA; Kalle run this
 adonis2(prop2[,c(12:58,59)] ~ Sample.type, data = prop, permutations = 9999, method = "bray") 
 # p = 1e-04***
 
-# NMDS
+
+
+# NMDS; Kalle run this
 NMDS3 <- metaMDS(prop2[,c(12:58,59)], distance = "bray", k =2, try = 10, trymax = 200, autotransform = FALSE)
 NMDS3 # Stress:0.1468733 
 
 
 stressplot(NMDS3)
 
-# Plot for both species and tissue type
-ordiplot(NMDS3, display = "sites", type = "n",  main = "Tissue types")
-points(NMDS3, display = "sites", pch = c(5,19)[as.factor(prop$Species)], cex=2, col = as.factor(prop$Sample.type))
-legend("bottomleft", legend = levels(as.factor(prop2$Sample.type)), pch =  c(19)[as.factor(prop$Species)], col =c(1:3), cex=2)
-legend("topleft", legend = levels(as.factor(prop2$Species)), pch =  c(5,19), cex=2, col = 1)
+# Plot for both species and tissue type; Kalle run this
+dev.off()
 
+layout(rbind(1,2), heights=c(7,1))
+
+ordiplot(NMDS3, display = "sites", type = "n",  main = "Tissue types")
+points(NMDS3, display = "sites", pch = c(21:23)[as.factor(prop2$Sample.type)], cex=2,  bg =c("#8400D8", "#11811D")[as.factor(prop$Species)])
+
+par(mar=c(0, 0, 0, 0))
+
+legend("bottomleft", legend = levels(as.factor(prop2$Sample.type)), pch =  c(21:23), col ="black",
+       ncol=1,bty ="n")
+#legend( legend = levels(as.factor(prop2$Species)), pch =  c(5,19), cex=2, col = 1)
+
+#col =c("#8400D8", "#11811D")[as.factor(prop$Species)],
  ##heterophyllum##
 
 hetprop <- subset(prop, Species=="HET")
